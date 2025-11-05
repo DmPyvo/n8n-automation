@@ -1,0 +1,90 @@
+{
+  "name": "GitHub Repository Analyzer",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "6f27f4dd-5c3a-4bbc-a4f8-1234567890ab",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.github.com/repos/n8n-io/n8n",
+        "authentication": "none",
+        "sendQuery": false,
+        "sendHeaders": true,
+        "sendBody": false
+      },
+      "id": "7a38g5ee-6d4b-5ccd-b5g9-2345678901bc",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "fields": {}
+      },
+      "id": "8b49h6ff-7e5c-6dde-c6ha-3456789012cd",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "// GitHub Repository Summary Generator\nreturn $input.all().map((item) => ({\n  name: item.json.name,\n  description: item.json.description,\n  stars: item.json.stargazers_count,\n  forks: item.json.forks_count,\n  language: item.json.language,\n  updated_at: item.json.updated_at,\n  summary: `${item.json.name} - ${item.json.stargazers_count} stars`\n}));"
+      },
+      "id": "9c50i7gg-8f6d-7eef-d7ib-4567890123de",
+      "name": "Code in JavaScript",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "tags": ["github", "api", "analysis"],
+  "pinData": {}
+}
